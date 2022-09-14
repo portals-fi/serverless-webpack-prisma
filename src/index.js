@@ -105,7 +105,14 @@ class ServerlessWebpackPrisma {
   }
 
   deleteUnusedEngines({ cwd }) {
-    const unusedEngines = glob.sync(this.engines, { cwd });
+    const additionalFilters = _.get(
+      this.serverless,
+      'service.custom.prisma.filters',
+      []
+    );
+    const unusedEngines = glob.sync(this.engines.concat(additionalFilters), {
+      cwd,
+    });
     if (unusedEngines.length <= 0) return;
     this.serverless.cli.log(`Remove unused prisma engine:`);
     unusedEngines.forEach((engine) => {
